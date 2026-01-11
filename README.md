@@ -23,8 +23,8 @@ file. The input file is not modified.
 Downloading the program
 -----------------------
 
-If you just want to run the program on Windows, download the pre-built
-rnxde.exe file from Releases.
+If you just want to run the program on Windows, download the rnxde.exe
+file from Releases.
 
 No need to download other files.
 
