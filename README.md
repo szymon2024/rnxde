@@ -63,11 +63,11 @@ naukowej. Używany jest jako polecenie w wierszu poleceń.
 Opis działania programu:
 
 Program wyszukuje w pliku fragmenty liczb zapisanych w notacji
-naukowej i zamienia literę 'D' lub 'd' na 'e'. Zmieniane są liczby
-wymienione w publicznie dostępnej specyfikacji rinex304 jako
+naukowej i zamienia literę 'D' lub 'd' na 'e'. Zmieniane są typy
+liczby wymienione w publicznie dostępnej specyfikacji rinex304 jako
 Double. Pozycja liczb również została ustalona na podstawie
-specyfikacji rinex304. Wynikiem działania jest nowy plik
-RINEX.  Plik wejściowy nie jest modyfikowany.
+specyfikacji rinex304. Wynikiem działania jest nowy plik RINEX.  Plik
+wejściowy nie jest modyfikowany.
 
 
 Pobieranie programu
