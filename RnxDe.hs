@@ -1,4 +1,4 @@
--- 2026-01-11
+-- 2026-01-12
 
 {- | The program creates a version of the RINEX 3.04 navigation file,
      replacing the letter "D" or "d" with the letter "e" in numbers,
@@ -14,9 +14,11 @@
      IONOSPHERIC CORR, D12.4 is specified. The field length is 12 and
      the precision is 4. Width = 12 - 4 = 8.
 
-     NOTE:
-       It is important to detect END OF HEADER from column 60,
-       because there can be END OF HEADER in comment fields.
+     NOTE 1: The program reads the lines together with the eol because
+             the lines need to be recreated together with the eol.
+       
+     NOTEE 2: It is important to detect END OF HEADER from column 60,
+              because there can be END OF HEADER in comment fields.
 
 -}
 
@@ -44,7 +46,7 @@ data Range = Range { width :: Int64     -- ^ from rinex 3.04 specification: fiel
                    }
 
 programVersion :: String
-programVersion = "1.0.0"
+programVersion = "1.0.1"
            
 main :: IO ()
 main = do
@@ -178,15 +180,17 @@ deBody :: L8.ByteString -> B.Builder
 deBody Empty = mempty
 deBody bs =
     let (l80, bs1)  = L8.splitAt 80 bs
-        (eol   , bs2) = L8.span (`L8.elem` "\n\r") bs1
+        (eol   , bs2) = readEOL bs1
     in case L8.head bs of
          ' ' -> deFields [ Range 7 23, Range 7 19 , Range 7 19 , Range 7 19 ] l80
                 <> B.lazyByteString eol
                 <> deBody bs2
-         c | c `L8.elem` "GREJCIS" ->
+         c | c `L8.elem` "GREJCIS"  ->
                deFields [ Range 7 42, Range 7 19 , Range 7 19] l80
                 <> B.lazyByteString eol
                 <> deBody bs2
+           | c == '\r' || c == '\n' ->
+               B.lazyByteString eol
          c   -> errorWithoutStackTrace $
                   "Error\n\
                   \Unexpected character '" ++ [c] ++ "' at the beginning of the line."
@@ -291,8 +295,6 @@ deHdr bs0
       lookEOH = (== "END OF HEADER") . L8.take 13 . L8.dropWhile isSpace . L8.drop 60
 
       read80    = L8.splitAt 80
-      
-      readEOL   = L8.span (`L8.elem` "\r\n")      -- Note: It reads empty lines too.
 
       read73    = L8.splitAt 73
 
@@ -301,7 +303,18 @@ deHdr bs0
       -- Header fields
       rnxVer      = trim . takeField  0 9
       rnxFileType = trim . takeField 20 1
-                   
+
+----------------------------------------------------------------------
+                    
+readEOL :: L8.ByteString -> (L8.ByteString, L8.ByteString)
+readEOL bs =
+    case L8.uncons bs of
+      Just ('\n', rest)  -> ("\n", rest)
+      Just ('\r', rest1) -> case L8.uncons rest1 of
+                              Just ('\n', rest2) -> ("\r\n", rest2)
+                              _                  -> ("\r"  , rest1)
+      _                  -> error "Cannot find end of line."
+
 ----------------------------------------------------------------------
   
 -- | Trim leading and trailing whitespace from a ByteString.              
