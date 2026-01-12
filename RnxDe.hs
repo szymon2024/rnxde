@@ -14,11 +14,8 @@
      IONOSPHERIC CORR, D12.4 is specified. The field length is 12 and
      the precision is 4. Width = 12 - 4 = 8.
 
-     NOTE 1: The program reads the lines together with the eol because
-             the lines need to be recreated together with the eol.
-       
-     NOTEE 2: It is important to detect END OF HEADER from column 60,
-              because there can be END OF HEADER in comment fields.
+     NOTE : It is important to detect END OF HEADER from column 60,
+            because there can be END OF HEADER in comment fields.
 
 -}
 
